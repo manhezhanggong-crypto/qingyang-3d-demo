@@ -1,0 +1,159 @@
+.cover-mode > header,.cover-mode > main{display:none}
+.cover[hidden]{display:none}
+.cover{
+ position:relative;isolation:isolate;min-height:100svh;overflow:hidden;border:0;border-radius:0;
+ color:#f4f8ff;background:radial-gradient(ellipse at 78% 36%,#244c7d 0,#0e2b4e 45%,#06162c 78%);
+ display:grid;grid-template-rows:auto 1fr;align-items:center;
+}
+.cover::after{
+ content:"";position:absolute;inset:4%;z-index:-1;pointer-events:none;
+ border-top:1px solid #6ca3e42b;border-bottom:1px solid #6ca3e42b;
+ background:linear-gradient(90deg,transparent 5%,#6ca3e42b 5% calc(5% + 1px),transparent calc(5% + 1px));
+}
+.cover-scene{
+ position:absolute;z-index:-2;right:-3%;top:5%;bottom:0;width:79%;
+ background:url("assets/qingyang-panorama-repaired.png") right center/100% auto no-repeat;
+ mask-image:linear-gradient(90deg,transparent 0%,#000 30%),linear-gradient(0deg,transparent,#000 18% 84%,transparent);
+ mask-composite:intersect;
+}
+.cover-nav{padding:clamp(1.1rem,3vw,2.4rem) clamp(1.5rem,6vw,7rem)}
+.cover-nav a{color:#e5f2ff;text-decoration:none;font-size:.9rem}
+.cover-nav a:hover{text-decoration:underline}
+.cover-copy{margin:0 clamp(1.5rem,6vw,7rem);max-width:36rem;padding:1.6rem 0 5rem}
+.cover-copy::before{content:"";display:block;width:76px;height:2px;background:#48b7ff;margin-bottom:1.9rem}
+.cover-project{color:#b4d9ff;letter-spacing:.08em}
+#cover-title{color:#fff;font-size:clamp(3.3rem,5.5vw,6.5rem);letter-spacing:-.045em;margin:.14em 0 .25em;line-height:1.08}
+#cover-title span{color:#65b9ff;font-style:italic;margin-right:.08em}
+.cover-summary{font-size:clamp(1rem,1.4vw,1.3rem);color:#d0e4f7}
+#enter-scene{margin-top:1.55rem;padding:1rem 1.35rem;color:white;background:linear-gradient(#0975d2,#0553a0);border-color:#369be8;font-size:1.05rem}
+#enter-scene:hover{background:#0874c3}
+#enter-scene span{padding-left:.9rem}
+@media(max-width:900px){
+ .cover{grid-template-rows:auto auto minmax(250px,1fr);align-items:stretch}
+ .cover-scene{position:relative;z-index:-1;grid-row:3;right:auto;top:auto;bottom:auto;width:100%;height:100%;min-height:250px;background-position:center 48%;background-size:contain;mask-image:linear-gradient(0deg,transparent,#000 12% 88%,transparent)}
+ .cover-copy{grid-row:2;padding:1.7rem 0 .75rem}
+ .cover-copy::before{margin-bottom:1.15rem}
+ #cover-title{font-size:clamp(2.65rem,8.4vw,5.15rem)}
+ #enter-scene{margin-top:.8rem}
+}
+
+/* Far landscape, near construction site, then readable UI. */
+.cover-landscape{
+ position:absolute;inset:-3%;z-index:-4;pointer-events:none;
+ background:url("assets/dusk-landscape.png") center/cover no-repeat;
+ animation:landscape-drift 25s ease-in-out infinite alternate;
+}
+.cover::before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(90deg,#06162cf5 0%,#06162cd9 23%,#06162c25 57%,transparent 76%);
+}
+.cover::after{z-index:0}
+.cover-nav,.cover-copy{position:relative;z-index:1}
+.cover-scene{
+ right:0;width:78%;top:8%;bottom:1%;pointer-events:none;mix-blend-mode:lighten;
+ mask-image:linear-gradient(90deg,transparent 4%,#000 23% 73%,transparent 87%),
+            linear-gradient(0deg,transparent 0%,#000 18% 81%,transparent 96%);
+ mask-composite:intersect;
+ animation:scene-drift 17s ease-in-out infinite alternate;
+}
+.cover-nav a,.cover-copy > *{animation:cover-reveal .7s ease-out both}
+.cover-nav a{display:inline-block}
+.cover-project{animation-delay:.12s}
+#cover-title{animation-delay:.24s}
+.cover-summary{animation-delay:.38s}
+#enter-scene{animation-delay:.52s}
+@keyframes landscape-drift{from{transform:scale(1.025)}to{transform:translate(-.8%,-.35%) scale(1.055)}}
+@keyframes scene-drift{from{transform:translate(0,0)}to{transform:translate(1.4%,-1.2%) scale(1.025)}}
+@keyframes cover-reveal{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){
+ .cover::before{background:linear-gradient(180deg,#06162cce 0%,#06162c80 36%,transparent 63%)}
+ .cover-scene{
+  width:100%;right:auto;top:auto;bottom:auto;
+  mask-image:linear-gradient(90deg,transparent 4%,#000 18% 72%,transparent 87%),
+             linear-gradient(0deg,transparent 0%,#000 16% 84%,transparent 100%);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .cover-landscape,.cover-scene,.cover-nav a,.cover-copy > *{animation:none}
+}
+
+.cover-scene{
+ translate:var(--near-x,0px) var(--near-y,0px);
+ transition:translate 460ms cubic-bezier(.2,.65,.25,1);
+ mask-image:linear-gradient(90deg,transparent 4%,#000 23% 73%,transparent 87%),
+            linear-gradient(0deg,transparent 0%,#000 18% 69%,transparent 89%);
+}
+.cover-landscape{
+ translate:var(--far-x,0px) var(--far-y,0px);
+ transition:translate 700ms cubic-bezier(.2,.65,.25,1);
+}
+.cover-leaving{animation:cover-out 280ms ease-in both;pointer-events:none}
+.scene-entering > header,.scene-entering > main{animation:workspace-in 350ms ease-out both}
+@keyframes cover-out{to{opacity:0}}
+@keyframes workspace-in{from{opacity:0}to{opacity:1}}
+@media(max-width:900px){
+ .cover-scene{
+  mask-image:linear-gradient(90deg,transparent 4%,#000 18% 72%,transparent 87%),
+             linear-gradient(0deg,transparent 0%,#000 16% 72%,transparent 91%);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .cover-scene,.cover-landscape{transition:none}
+ .cover-leaving,.scene-entering > header,.scene-entering > main{animation:none}
+}
+
+/* A sharp project core over a softly feathered site perimeter. */
+.cover-scene{
+ width:86%;right:-5%;top:4%;bottom:-5%;
+ background:none;mask-image:none;
+}
+.cover-scene::before,.cover-scene::after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:url("assets/qingyang-panorama-repaired.png") right center/100% auto no-repeat;
+ mask-composite:intersect;
+}
+.cover-scene::before{
+ filter:blur(15px);opacity:.62;
+ mask-image:radial-gradient(ellipse 51% 48% at 53% 56%,#000 47%,transparent 100%),
+  linear-gradient(0deg,transparent 2%,#000 24% 62%,transparent 94%);
+}
+.cover-scene::after{
+ mask-image:radial-gradient(ellipse 48% 46% at 52% 57%,#000 45%,transparent 95%),
+  linear-gradient(0deg,transparent 5%,#000 24% 56%,transparent 83%);
+}
+@media(max-width:900px){
+ .cover-scene{width:100%;right:auto;top:auto;bottom:auto;mask-image:none}
+ .cover-scene::before,.cover-scene::after{background-position:center;background-size:115% auto}
+}
+
+/* Low-saturation, finely frosted construction foreground. */
+.cover-scene::before{filter:saturate(.52) contrast(.91) blur(15px)}
+.cover-scene::after{
+ filter:saturate(.62) contrast(.93) blur(.55px);
+ background-image:
+  repeating-linear-gradient(117deg,#d9e9ff10 0 1px,transparent 1px 3px),
+  repeating-linear-gradient(21deg,#071e3410 0 1px,transparent 1px 4px),
+  url("assets/qingyang-panorama-repaired.png");
+ background-size:100% 100%,100% 100%,100% auto;
+ background-position:center,center,right center;
+ background-blend-mode:soft-light,soft-light,normal;
+ mask-image:radial-gradient(ellipse 48% 46% at 52% 57%,#000 45%,transparent 95%),
+  linear-gradient(0deg,transparent 5%,#000 24% 56%,transparent 83%);
+}
+@media(max-width:900px){
+ .cover-scene::after{background-size:100% 100%,100% 100%,115% auto;background-position:center}
+}
+
+.cover-particles{
+ position:absolute;inset:0;width:100%;height:100%;z-index:1;
+ pointer-events:none;mix-blend-mode:screen;opacity:.9
+}
+
+#cover-title span{
+ display:inline-block;position:relative;left:-.06em;padding-inline:.06em .22em;margin-left:-.06em;margin-right:.10em;
+ letter-spacing:-.035em;
+ background:linear-gradient(165deg,#f1fbff 4%,#a8dbff 34%,#69bfff 48%,#248be3 53%,#63c7ff 91%);
+ background-clip:text;-webkit-background-clip:text;color:transparent;
+ -webkit-text-stroke:1px #c2e9ff75;
+ filter:drop-shadow(0 2px 3px #021933c0) drop-shadow(0 0 9px #52afff45);
+}

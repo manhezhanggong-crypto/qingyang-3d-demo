@@ -1,0 +1,166 @@
+body:not(.cover-mode){background:#13263e}
+body:not(.cover-mode)>header{
+ position:relative;z-index:2;height:64px;padding:0 clamp(12px,3vw,40px);
+ background:linear-gradient(110deg,#25496f,#13283f);
+ color:#eef7ff;border-bottom:1px solid #5585ae;gap:14px
+}
+body:not(.cover-mode)>header img{display:none}
+body:not(.cover-mode)>header>div:nth-child(2){padding:0;border:0}
+body:not(.cover-mode)>header h1{color:#f0f7ff;font-size:clamp(16px,1.6vw,24px);margin:0}
+body:not(.cover-mode)>header p{color:#b2c9e1}
+.header-right{display:none!important}
+.workspace-nav{margin-left:auto;display:flex;gap:6px}
+.workspace-nav button,.scene .controls button,.agent-head button{
+ color:#eff7ff;background:#294b6c;border:1px solid #527b9d;white-space:nowrap
+}
+.workspace-nav button:hover,.scene .controls button:hover,.agent-head button:hover{background:#38658b}
+body:not(.cover-mode)>main{
+ position:relative;display:block;padding:0;height:calc(100svh - 64px);min-height:460px
+}
+body:not(.cover-mode)>main>aside:not(.agent-drawer):not(.project-glass){display:none}
+.scene{position:absolute;inset:0;border:0;border-radius:0;min-height:0;background:#13263e}
+.scene-head,.scene-tag,.scene .footer-note{display:none}
+.scene .stage{background:#13263e;min-height:0}
+.scene .controls{
+ position:absolute;z-index:1;left:50%;bottom:18px;translate:-50% 0;
+ width:min(660px,calc(100% - 28px));border:1px solid #648ca8;border-radius:22px;
+ background:#12304de3;backdrop-filter:blur(12px);padding:8px 12px
+}
+#load-status{display:block;position:absolute;bottom:68px;left:20px;background:#102c47d9;color:#e7f5ff;padding:5px 10px;border-radius:6px}
+.agent-drawer{
+ position:absolute;z-index:2;inset:clamp(12px,3vh,38px) 18px auto auto;width:min(288px,calc(100% - 36px));
+ max-height:calc(100% - 125px);border:1px solid #729bc4;border-radius:12px;color:#edf7ff;
+ background:linear-gradient(145deg,#35638bd9,#163651dc);backdrop-filter:blur(13px);box-shadow:0 14px 36px #00193363
+}
+.agent-drawer[hidden]{display:none}
+.agent-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #709bc550}
+.agent-head h2{margin:0;padding:0;border:0;color:inherit;font-size:20px}
+.agent-body{padding:15px 16px}
+.agent-upload{display:grid;place-items:center;gap:6px;padding:20px 8px;border:1px dashed #92b9e0;border-radius:10px;background:#315f8bb3;cursor:pointer}
+.agent-upload span{font-size:28px;line-height:1}
+.agent-note{font-size:12px;color:#c5dbee}
+#agent-status{background:#203e5c;padding:8px 10px;border-radius:6px}
+#agent-files{margin:8px 0;padding-left:1.25rem;max-height:135px;overflow:auto;overflow-wrap:anywhere}
+@media(max-width:640px){
+ body:not(.cover-mode)>header p{display:none}
+ .workspace-nav{gap:3px}
+ .workspace-nav button{padding:5px;font-size:12px}
+ .agent-drawer{width:min(245px,calc(100% - 36px))}
+ .scene .controls button{padding:5px 7px}
+}
+
+/* Project facts on the left; evidence review alongside Agent intake. */
+.workspace-brand{
+ display:flex;align-items:center;justify-content:center;flex-shrink:0;
+ padding:5px 10px;border:1px solid #ffffffa6;border-radius:9px;
+ background:linear-gradient(135deg,#f4faffee,#c6deefe0);
+ backdrop-filter:blur(14px);box-shadow:0 5px 16px #05192e50,inset 0 1px 0 #fff9
+}
+body:not(.cover-mode)>header .workspace-brand img{
+ display:block;width:clamp(145px,19vw,292px);height:38px;
+ object-fit:contain;background:transparent
+}
+body:not(.cover-mode)>main>.project-glass{
+ display:flex;position:absolute;z-index:2;top:clamp(12px,3vh,38px);left:18px;
+ width:min(255px,calc(100% - 36px));max-height:calc(100% - 118px);overflow:auto;
+ border-radius:12px;scrollbar-width:thin
+}
+body:not(.cover-mode)>main>.project-glass[hidden]{display:none}
+.project-glass article,.agent-drawer article{
+ color:#edf7ff;background:linear-gradient(145deg,#315676e8,#162f49e8);
+ border:1px solid #789db667;border-radius:11px;
+ backdrop-filter:blur(14px);box-shadow:0 7px 20px #051a3438;
+ padding:14px
+}
+.project-glass article h2,.agent-drawer article h2{color:#f2f8ff;margin-bottom:12px}
+.project-glass .muted,.project-glass .label,.agent-drawer .muted,.agent-drawer .small{color:#c1d7e9}
+.project-glass .value{color:#9bd7ff}
+.project-glass .good{color:#a5edcc}
+.project-glass .demo,.project-glass .pending{color:#ffcf91}
+.project-glass .row,.agent-drawer .event{border-color:#c5e7ff29}
+.agent-drawer{gap:0;overflow:auto;scrollbar-width:thin}
+.agent-drawer article{margin:0 12px 12px}
+.agent-drawer article button:not(.primary){background:#eaf4fd;color:#154b73}
+.agent-drawer article textarea#note{background:#eef6fc!important}
+.agent-drawer .point.event{margin-top:5px;padding:8px}
+@media(max-width:900px){
+ body:not(.cover-mode)>header>div:nth-child(2){display:none}
+ body:not(.cover-mode)>main>.project-glass{max-height:calc(100% - 145px)}
+}
+@media(max-width:520px){
+ body:not(.cover-mode)>header{gap:5px;padding-inline:7px}
+ .workspace-brand{padding:3px 5px}
+ body:not(.cover-mode)>header .workspace-brand img{width:clamp(96px,29vw,145px);height:30px}
+ .workspace-nav button{font-size:11px;padding-inline:4px}
+}
+
+/* Glass highlights are clipped to the transparent artwork. */
+.workspace-brand{
+ position:relative;padding:0;border:0;border-radius:0;background:none;
+ backdrop-filter:none;box-shadow:none;
+ filter:drop-shadow(0 1px 1px #061a2d) drop-shadow(0 0 8px #8bc8ff53)
+}
+body:not(.cover-mode)>header .workspace-brand img{
+ width:clamp(230px,25vw,410px);height:54px;opacity:0
+}
+.workspace-brand::after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(170deg,#f9fdff 10%,#b7e1ff 43%,#77b9ee 56%,#e5f5ff 91%);
+ mask:url("assets/company-logo-transparent.png") center/contain no-repeat;
+}
+@media(max-width:700px){
+ body:not(.cover-mode)>header .workspace-brand img{width:clamp(115px,31vw,218px);height:42px}
+}
+
+body:not(.cover-mode)>header{height:78px}
+body:not(.cover-mode)>main{height:calc(100svh - 78px)}
+.workspace-brand::after{mask-size:100% auto;mask-position:center 63%}
+body:not(.cover-mode)>header .workspace-brand img,
+.cover-nav .cover-brand img{
+ display:block;width:clamp(260px,26vw,435px);height:clamp(54px,7vw,108px);opacity:0
+}
+body:not(.cover-mode)>header .workspace-brand img{height:76px}
+.cover-nav .cover-brand{width:max-content;max-width:100%}
+@media(max-width:700px){
+ body:not(.cover-mode)>header .workspace-brand img{width:clamp(140px,35vw,245px);height:60px}
+ .cover-nav .cover-brand img{width:min(280px,72vw);height:68px}
+}
+
+/* Preserve the mark's original blue and white artwork. */
+.workspace-brand::after{content:none}
+body:not(.cover-mode)>header .workspace-brand img,
+.cover-nav .cover-brand img{
+ opacity:1;object-fit:cover;object-position:center 63%;
+ filter:brightness(1.16) drop-shadow(0 1px 2px #00122488);
+}
+@media(max-width:700px){
+ body:not(.cover-mode)>header .workspace-brand img,.cover-nav .cover-brand img{object-fit:contain}
+}
+
+/* Center the platform name independently of the logo and navigation widths. */
+body:not(.cover-mode)>header>div:nth-child(2){
+ position:absolute;left:50%;top:50%;translate:-50% -50%;display:block;
+ max-width:38vw;padding:7px 19px;text-align:center;
+ border:1px solid #a9d5ff52;border-radius:12px;
+ background:linear-gradient(155deg,#9ccfff35,#4b83ba22);
+ backdrop-filter:blur(14px);
+ box-shadow:0 6px 19px #04142c75,inset 0 1px 0 #e9f7ff36;
+}
+body:not(.cover-mode)>header>div:nth-child(2) h1{
+ color:#f4faff;white-space:nowrap;
+ font-size:clamp(15px,1.5vw,24px);text-shadow:0 2px 7px #081d35aa
+}
+body:not(.cover-mode)>header>div:nth-child(2) p{text-shadow:0 1px 4px #081d3599}
+@media(max-width:1320px){
+ body:not(.cover-mode)>header{height:116px;align-items:flex-start;padding-top:4px}
+ body:not(.cover-mode)>main{height:calc(100svh - 116px)}
+ body:not(.cover-mode)>header .workspace-brand img{height:59px}
+ body:not(.cover-mode)>header .workspace-nav{align-self:flex-start;margin-top:11px}
+ body:not(.cover-mode)>header>div:nth-child(2){
+  top:auto;bottom:8px;translate:-50% 0;max-width:none;width:max-content;padding:4px 12px
+ }
+ body:not(.cover-mode)>header>div:nth-child(2) p{display:block}
+}
+@media(max-width:520px){
+ body:not(.cover-mode)>header>div:nth-child(2) h1{font-size:clamp(12px,4vw,16px)}
+}

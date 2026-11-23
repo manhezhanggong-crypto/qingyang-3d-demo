@@ -1,15 +1,40 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI智绘工程 · 智能巡检演示</title>
 
 
-<link rel="stylesheet" href="site.css"></head><body>
-<header><img src="assets/company-logo.png" alt="中建四局贵州投资建设有限公司"><div><h1>AI智绘工程 · 智能巡检演示平台</h1><p>青羊55亩项目 · 三维实景与巡检辅助</p></div><div class="header-right"><div class="demo">功能演示 · AI识别尚未接入</div><div class="muted" id="clock"></div></div></header>
+<link rel="stylesheet" href="site.css"><link rel="stylesheet" href="cover.css?v=10"><link rel="stylesheet" href="immersive.css?v=glass5"></head><body class="cover-mode">
+<section class="cover" id="site-cover" aria-labelledby="cover-title">
+  <nav class="cover-nav"><a class="workspace-brand cover-brand" href="https://4gzic.cscec.com/" target="_blank" rel="noopener noreferrer" aria-label="打开中建四局贵州投资建设有限公司官网"><img src="assets/company-logo-transparent.png" alt="中建四局贵州投资建设有限公司"></a></nav>
+  <div class="cover-landscape" aria-hidden="true"></div>
+  <div class="cover-scene" aria-hidden="true"><canvas class="cover-particles"></canvas></div>
+  <div class="cover-copy">
+    <p class="cover-project">青羊55亩项目 · 三维实景</p>
+    <h1 id="cover-title"><span>AI</span>智绘工程</h1>
+    <p class="cover-summary">浏览施工现场全景，查看 11 栋住宅楼的空间位置。</p>
+    <button type="button" id="enter-scene">进入三维实景 <span aria-hidden="true">→</span></button>
+  </div>
+</section>
+<header><a class="workspace-brand" href="https://4gzic.cscec.com/" target="_blank" rel="noopener noreferrer" aria-label="打开公司官网"><img src="assets/company-logo-transparent.png" alt="中建四局贵州投资建设有限公司"></a><div><h1>AI智绘工程 · 智能巡检演示平台</h1><p>青羊55亩项目 · 三维实景与巡检辅助</p></div><div class="header-right"><div class="demo">功能演示 · AI识别尚未接入</div><div class="muted" id="clock"></div></div><nav class="workspace-nav" aria-label="工作台">
+<button type="button" id="toggle-project" aria-expanded="true">项目信息</button><button type="button" id="overview-view">项目总览</button>
+<button type="button" id="open-housing-plan">楼栋定位</button>
+<button type="button" id="toggle-agent" aria-controls="agent-drawer" aria-expanded="true">巡检 Agent</button>
+</nav></header>
 <main><aside><article><h2>青羊55亩项目</h2><p class="muted">成都市青羊区蔡桥片区</p><div class="stats"><div><div class="value">512<span style="font-size:14px">万</span></div><div class="label">编辑模型高斯基元</div></div><div><div class="value">1<span style="font-size:14px">期</span></div><div class="label">已提供现场模型</div></div></div><div class="row"><span>用地面积</span><span>37,131.25㎡</span></div><div class="row"><span>住宅规模</span><span>11栋</span></div><div class="row"><span>地下室</span><span>1层</span></div><div class="row"><span>影像采集设备</span><span>Mini 4 Pro</span></div><div class="row"><span>场景数据</span><span class="good">本地模型</span></div><div class="row"><span>采集日期</span><span class="pending">待补充</span></div><p class="muted">设计信息引自《青羊55亩交底报告》第4页，模型点位待逐一对应。总建筑面积在报告中存在差异，暂待核定。</p></article>
 <article><h2>采集与分析状态</h2><div class="row"><span>无人机定时巡航</span><span class="pending">待接入</span></div><div class="row"><span>实时视频</span><span class="pending">待接入</span></div><div class="row"><span>AI异常识别</span><span class="demo">模拟演示</span></div><div class="row"><span>多期变化检测</span><span class="pending">待第二期数据</span></div></article>
-<article><h2>场景视角</h2><button class="point" id="open-housing-plan">楼栋定位 · 1–11号楼</button><button class="point active" data-time="0">工区全景</button><button class="point" data-time="9">作业面近景</button><button class="point" data-time="19">反向总览</button><p class="muted">选择楼栋近景或切换预设视角。</p></article></aside>
+<article><h2>场景视角</h2><button class="point">楼栋定位 · 1–11号楼</button><button class="point active" data-time="0">工区全景</button><button class="point" data-time="9">作业面近景</button><button class="point" data-time="19">反向总览</button><p class="muted">选择楼栋近景或切换预设视角。</p></article></aside>
 <section class="scene"><div class="scene-head"><strong>三维现场</strong><span class="muted">编辑版实景 · 浏览器渲染</span></div><div class="stage"><iframe id="viewer" title="工程三维实景" allow="fullscreen"></iframe><div class="scene-tag">3DGS 实景 · 人工核查辅助</div></div>
 <div class="controls"><button id="play" class="primary" disabled>镜头巡览</button><button id="reset" disabled>全景复位</button><input id="timeline" type="range" min="0" max="24" step=".1" value="0" aria-label="巡览时间轴" disabled><button id="reload-scene">重新加载场景</button><button id="fullscreen">全屏</button></div><p id="load-status" class="footer-note">正在读取三维实景模型…</p><div class="footer-note">播放预设巡览后可暂停并用鼠标查看。左侧视角按钮可定位预设机位。</div></section>
 <aside class="right"><article><h2>AI巡检演示</h2><p>演示疑似问题从提示到人工复核的处理过程。</p><p class="muted">下方内容为模拟样例，与模型中的真实情况无对应关系。</p><button id="simulate" class="primary">运行模拟巡检</button><button id="clear">清空</button><div id="event-list" aria-live="polite"><div class="empty">尚未运行模拟巡检</div></div></article>
-<article><h2>核查记录</h2><div id="detail" class="muted">选择模拟提示，查看核查说明。</div><label class="muted" style="display:block;margin:14px 0 6px">人工备注</label><textarea id="note" rows="3" style="width:100%;background:#091b2b;color:white;border:1px solid #35506a;padding:10px;border-radius:5px" placeholder="记录需要现场复核的事项"></textarea><button id="save">保存本机记录</button><button id="download">导出记录</button><p id="save-status" class="small">备注仅保存在当前浏览器中。</p></article></aside></main>
+<article><h2>核查记录</h2><div id="detail" class="muted">选择模拟提示，查看核查说明。</div><label class="muted" style="display:block;margin:14px 0 6px">人工备注</label><textarea id="note" rows="3" style="width:100%;background:#091b2b;color:white;border:1px solid #35506a;padding:10px;border-radius:5px" placeholder="记录需要现场复核的事项"></textarea><button id="save">保存本机记录</button><button id="download">导出记录</button><p id="save-status" class="small">备注仅保存在当前浏览器中。</p></article></aside><aside id="agent-drawer" class="agent-drawer" aria-labelledby="agent-title">
+<div class="agent-head"><h2 id="agent-title">巡检 Agent</h2><button type="button" id="close-agent" aria-label="收起巡检 Agent">›</button></div>
+<div class="agent-body">
+<label for="agent-photos" class="agent-upload"><span aria-hidden="true">↑</span>选择航拍照片</label>
+<input id="agent-photos" type="file" accept="image/*" multiple hidden>
+<p id="agent-status" role="status">等待接入照片</p>
+<ul id="agent-files" aria-label="待接入文件"></ul>
+<p class="agent-note">本地演示 · 数据接收服务待接入</p>
+</div>
+</aside>
+</main>
 
 <dialog id="housing-plan" aria-labelledby="housing-plan-title">
 <form method="dialog"><button style="float:right">关闭</button></form>
@@ -23,43 +48,65 @@
 </dialog>
 <script src="site-config.js"></script>
 <script>
-(async () => {
+(() => {
   const config = window.siteConfig;
   document.querySelector('header h1').textContent = config.title;
   document.querySelector('header h1 + p').textContent = config.subtitle;
   document.title = config.title;
   const status = document.getElementById('load-status');
   const isLocalPreview = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
-  const modelUrl = isLocalPreview ? '/__preview/edit.sog' : config.modelUrl;
+  const modelUrl = config.modelUrl;
   if (!modelUrl && !config.modelParts?.length) {
     status.textContent = '展示模型待配置';
     return;
   }
   const viewer = new URL('supersplat-official/package/public/index.html', location.href);
-  if (modelUrl) {
-    viewer.searchParams.set('content', new URL(modelUrl, location.href).href);
-  } else {
-    try {
-      const parts = await Promise.all(config.modelParts.map(async part => {
-        const response = await fetch(part);
-        if (!response.ok) throw new Error(part);
-        return response.blob();
-      }));
-      viewer.searchParams.set('content', URL.createObjectURL(new Blob(parts)));
-      viewer.searchParams.set('filename', 'qingyang-edit.sog');
-    } catch {
-      status.textContent = '三维模型加载失败，请刷新重试。';
-      return;
-    }
-  }
-  viewer.searchParams.set('settings', 'cinematic.json');
+
+  viewer.searchParams.set('settings', 'cinematic-immersive.json');
   viewer.searchParams.set('lang', 'zh-CN');
   viewer.searchParams.set('noui', '');
   viewer.searchParams.set('noanim', '');
-  document.getElementById('viewer').src = viewer.href;
+  document.getElementById('enter-scene').addEventListener('click', () => {
+    const cover = document.getElementById('site-cover');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('enter-scene').disabled = true;
+    document.getElementById('viewer').dataset.autoplayTour = 'true';
+    const frame = document.getElementById('viewer');
+    const loadScene = async () => {
+      try {
+        if (modelUrl) {
+          viewer.searchParams.set('content', new URL(modelUrl, location.href).href);
+        } else {
+          const parts = await Promise.all(config.modelParts.map(async url => {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('模型分片加载失败');
+            return response.blob();
+          }));
+          viewer.searchParams.set('content', URL.createObjectURL(new Blob(parts)));
+          viewer.searchParams.set('filename', 'qingyang-edit.sog');
+        }
+        frame.src = viewer.href;
+      } catch {
+        status.textContent = '三维模型加载失败，请重新加载场景。';
+      }
+    };
+    loadScene();
+    const finish = () => {
+      cover.hidden = true;
+      document.body.classList.remove('cover-mode');
+      document.body.classList.add('scene-entering');
+      document.getElementById('open-housing-plan').focus({ preventScroll: true });
+    };
+    if (reducedMotion) {
+      finish();
+    } else {
+      cover.classList.add('cover-leaving');
+      setTimeout(finish, 280);
+    }
+  }, { once: true });
 })();
 </script>
-<script src="dashboard.js?v=timeline-fix1"></script>
+<script src="dashboard.js?v=auto-tour1"></script>
 <script>
 (() => {
   const buildings = window.siteConfig.buildings;
@@ -103,7 +150,7 @@
   };
 })();
 </script>
-</body></html>
+<script src="cover-motion.js?v=1"></script><script src="immersive.js?v=glass1"></script><script src="cover-particles.js?v=2"></script></body></html>
 
 
 

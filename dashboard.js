@@ -92,12 +92,20 @@ const timer=setInterval(()=>{
  attempts++;
  try{viewer=iframe.contentWindow.projectViewer;if(viewer?.state.loaded){
   clearInterval(timer);play.disabled=false;timeline.disabled=false;document.getElementById('reset').disabled=false;
-  document.getElementById('load-status').textContent='模型已就绪 · 白色背景 · 官方 SuperSplat Viewer';
+  document.getElementById('load-status').textContent='模型已就绪 · 官方 SuperSplat Viewer';
   viewer.app.graphicsDevice.on('devicelost',()=>{
    document.getElementById('load-status').textContent='图形设备连接中断，请点击重新加载场景。';
    play.disabled=true;timeline.disabled=true;
   });
   viewer.events.on('animationTime:changed',time=>{timeline.value=time;syncTimelineTrack();});
+  if (iframe.dataset.autoplayTour === 'true') {
+    delete iframe.dataset.autoplayTour;
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      viewer.state.cameraMode = 'anim';
+      viewer.state.animationPaused = false;
+      play.textContent = '暂停巡览';
+    }
+  }
  }}catch{}
  if(attempts>=240){clearInterval(timer);if(iframe.hasAttribute('src'))document.getElementById('load-status').textContent='加载较久，请检查模型地址、内存或浏览器硬件加速。';}
 },1000);
