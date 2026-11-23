@@ -1,0 +1,115 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI智绘工程 · 智能巡检演示</title>
+
+
+<link rel="stylesheet" href="site.css"></head><body>
+<header><img src="assets/company-logo.png" alt="中建四局贵州投资建设有限公司"><div><h1>AI智绘工程 · 智能巡检演示平台</h1><p>青羊55亩项目 · 三维实景与巡检辅助</p></div><div class="header-right"><div class="demo">功能演示 · AI识别尚未接入</div><div class="muted" id="clock"></div></div></header>
+<main><aside><article><h2>青羊55亩项目</h2><p class="muted">成都市青羊区蔡桥片区</p><div class="stats"><div><div class="value">512<span style="font-size:14px">万</span></div><div class="label">编辑模型高斯基元</div></div><div><div class="value">1<span style="font-size:14px">期</span></div><div class="label">已提供现场模型</div></div></div><div class="row"><span>用地面积</span><span>37,131.25㎡</span></div><div class="row"><span>住宅规模</span><span>11栋</span></div><div class="row"><span>地下室</span><span>1层</span></div><div class="row"><span>影像采集设备</span><span>Mini 4 Pro</span></div><div class="row"><span>场景数据</span><span class="good">本地模型</span></div><div class="row"><span>采集日期</span><span class="pending">待补充</span></div><p class="muted">设计信息引自《青羊55亩交底报告》第4页，模型点位待逐一对应。总建筑面积在报告中存在差异，暂待核定。</p></article>
+<article><h2>采集与分析状态</h2><div class="row"><span>无人机定时巡航</span><span class="pending">待接入</span></div><div class="row"><span>实时视频</span><span class="pending">待接入</span></div><div class="row"><span>AI异常识别</span><span class="demo">模拟演示</span></div><div class="row"><span>多期变化检测</span><span class="pending">待第二期数据</span></div></article>
+<article><h2>场景视角</h2><button class="point" id="open-housing-plan">楼栋定位 · 1–11号楼</button><button class="point active" data-time="0">工区全景</button><button class="point" data-time="9">作业面近景</button><button class="point" data-time="19">反向总览</button><p class="muted">选择楼栋近景或切换预设视角。</p></article></aside>
+<section class="scene"><div class="scene-head"><strong>三维现场</strong><span class="muted">编辑版实景 · 浏览器渲染</span></div><div class="stage"><iframe id="viewer" title="工程三维实景" allow="fullscreen"></iframe><div class="scene-tag">3DGS 实景 · 人工核查辅助</div></div>
+<div class="controls"><button id="play" class="primary" disabled>镜头巡览</button><button id="reset" disabled>全景复位</button><input id="timeline" type="range" min="0" max="24" step=".1" value="0" aria-label="巡览时间轴" disabled><button id="reload-scene">重新加载场景</button><button id="fullscreen">全屏</button></div><p id="load-status" class="footer-note">正在读取三维实景模型…</p><div class="footer-note">播放预设巡览后可暂停并用鼠标查看。左侧视角按钮可定位预设机位。</div></section>
+<aside class="right"><article><h2>AI巡检演示</h2><p>演示疑似问题从提示到人工复核的处理过程。</p><p class="muted">下方内容为模拟样例，与模型中的真实情况无对应关系。</p><button id="simulate" class="primary">运行模拟巡检</button><button id="clear">清空</button><div id="event-list" aria-live="polite"><div class="empty">尚未运行模拟巡检</div></div></article>
+<article><h2>核查记录</h2><div id="detail" class="muted">选择模拟提示，查看核查说明。</div><label class="muted" style="display:block;margin:14px 0 6px">人工备注</label><textarea id="note" rows="3" style="width:100%;background:#091b2b;color:white;border:1px solid #35506a;padding:10px;border-radius:5px" placeholder="记录需要现场复核的事项"></textarea><button id="save">保存本机记录</button><button id="download">导出记录</button><p id="save-status" class="small">备注仅保存在当前浏览器中。</p></article></aside></main>
+
+<dialog id="housing-plan" aria-labelledby="housing-plan-title">
+<form method="dialog"><button style="float:right">关闭</button></form>
+<h2 id="housing-plan-title">楼栋定位·1-11号楼</h2>
+<div class="plan-image">
+<img src="assets/housing-plan.png" alt="项目总体规划及五类住宅户型分布">
+<p class="plan-caption">总体规划-户型分布</p>
+</div>
+<p id="housing-detail" aria-live="polite">点击编号可查看楼栋户型并定位。</p>
+<div id="housing-camera"><button type="button" id="go-housing-view" class="primary" disabled>定位到该楼栋</button><p id="housing-camera-status" class="muted" aria-live="polite"></p></div><p class="muted">镜头按规划图与模型外观的对应位置设置。</p>
+</dialog>
+<script src="site-config.js"></script>
+<script>
+(async () => {
+  const config = window.siteConfig;
+  document.querySelector('header h1').textContent = config.title;
+  document.querySelector('header h1 + p').textContent = config.subtitle;
+  document.title = config.title;
+  const status = document.getElementById('load-status');
+  const isLocalPreview = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+  const modelUrl = isLocalPreview ? '/__preview/edit.sog' : config.modelUrl;
+  if (!modelUrl && !config.modelParts?.length) {
+    status.textContent = '展示模型待配置';
+    return;
+  }
+  const viewer = new URL('supersplat-official/package/public/index.html', location.href);
+  if (modelUrl) {
+    viewer.searchParams.set('content', new URL(modelUrl, location.href).href);
+  } else {
+    try {
+      const parts = await Promise.all(config.modelParts.map(async part => {
+        const response = await fetch(part);
+        if (!response.ok) throw new Error(part);
+        return response.blob();
+      }));
+      viewer.searchParams.set('content', URL.createObjectURL(new Blob(parts)));
+      viewer.searchParams.set('filename', 'qingyang-edit.sog');
+    } catch {
+      status.textContent = '三维模型加载失败，请刷新重试。';
+      return;
+    }
+  }
+  viewer.searchParams.set('settings', 'cinematic.json');
+  viewer.searchParams.set('lang', 'zh-CN');
+  viewer.searchParams.set('noui', '');
+  viewer.searchParams.set('noanim', '');
+  document.getElementById('viewer').src = viewer.href;
+})();
+</script>
+<script src="dashboard.js?v=timeline-fix1"></script>
+<script>
+(() => {
+  const buildings = window.siteConfig.buildings;
+  const dialog = document.getElementById('housing-plan');
+  const map = dialog.querySelector('.plan-image');
+  const detail = document.getElementById('housing-detail');
+  const status = document.getElementById('housing-camera-status');
+  const locate = document.getElementById('go-housing-view');
+  let selected;
+  document.getElementById('open-housing-plan').onclick = () => dialog.showModal();
+  for (const building of buildings) {
+    const { number, left, top, color, type } = building;
+    const marker = document.createElement('button');
+    marker.type = 'button';
+    marker.className = color;
+    marker.style.left = left + '%';
+    marker.style.top = top + '%';
+    marker.textContent = number;
+    marker.setAttribute('aria-label', number + '号楼，' + type);
+    marker.setAttribute('aria-pressed', 'false');
+    marker.onclick = () => {
+      selected = building;
+      map.querySelectorAll('button').forEach(button =>
+        button.setAttribute('aria-pressed', String(button === marker)));
+      detail.textContent = number + '# 楼 · ' + type;
+      status.textContent = '';
+      locate.disabled = false;
+    };
+    map.append(marker);
+  }
+  locate.onclick = () => {
+    if (!viewer?.state.loaded || typeof viewer.focusProjectPoint !== 'function') {
+      status.textContent = '三维定位尚未就绪，请稍后再试。';
+      return;
+    }
+    const { position, target, fov } = selected.camera;
+    dialog.close();
+    document.querySelectorAll('[data-time]').forEach(button => button.classList.remove('active'));
+    pause();
+    viewer.focusProjectPoint(position, target, fov, () => viewer.orbitProjectPoint(position, target, fov));
+  };
+})();
+</script>
+</body></html>
+
+
+
+
+
+
+
+
+
