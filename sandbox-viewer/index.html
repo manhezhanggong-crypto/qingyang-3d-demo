@@ -62,7 +62,7 @@
             // Names the bootstrap's contentUrl when the url itself has no usable name (a data:
             // uri, say) — the splat format is chosen by the name's extension. Ignored when a
             // ?content= override replaces the url it describes.
-            const contentFilename = url.searchParams.has('content') ? null : (bootstrap.contentFilename ?? null);
+            const contentFilename = url.searchParams.get('filename') ?? (url.searchParams.has('content') ? null : (bootstrap.contentFilename ?? null));
 
             const renderer = url.searchParams.has('webgl') ? 'webgl' : 'webgpu';
 

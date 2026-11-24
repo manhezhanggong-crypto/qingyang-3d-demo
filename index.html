@@ -60,7 +60,7 @@
     status.textContent = '展示模型待配置';
     return;
   }
-  const viewer = new URL('sandbox-viewer/index.html', location.href);
+  const viewer = new URL('sandbox-viewer/index.html?formatFix=1', location.href);
 
   viewer.searchParams.set('settings', 'cinematic-immersive.json');
   viewer.searchParams.set('facade', 'trial');
