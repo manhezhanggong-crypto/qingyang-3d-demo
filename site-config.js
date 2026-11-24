@@ -225,4 +225,4 @@ window.siteConfig = {
     }
   ]
 };
-window.siteConfig.modelParts = ["models/scene-0.bin","models/scene-1.bin","models/scene-2.bin","models/scene-3.bin"];
+window.siteConfig.modelParts = ["models/sandbox-0.bin", "models/sandbox-1.bin", "models/sandbox-2.bin"];

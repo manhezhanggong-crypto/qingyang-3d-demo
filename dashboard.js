@@ -89,6 +89,7 @@ document.querySelectorAll('[data-time]').forEach(button => {
 document.getElementById('fullscreen').onclick=()=>{const scene=document.querySelector('.scene');if(!document.fullscreenElement)scene.requestFullscreen().catch(()=>{});else document.exitFullscreen();};
 let attempts=0;
 const timer=setInterval(()=>{
+ if (!iframe.hasAttribute('src')) return;
  attempts++;
  try{viewer=iframe.contentWindow.projectViewer;if(viewer?.state.loaded){
   clearInterval(timer);play.disabled=false;timeline.disabled=false;document.getElementById('reset').disabled=false;

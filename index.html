@@ -22,7 +22,7 @@
 <article><h2>采集与分析状态</h2><div class="row"><span>无人机定时巡航</span><span class="pending">待接入</span></div><div class="row"><span>实时视频</span><span class="pending">待接入</span></div><div class="row"><span>AI异常识别</span><span class="demo">模拟演示</span></div><div class="row"><span>多期变化检测</span><span class="pending">待第二期数据</span></div></article>
 <article><h2>场景视角</h2><button class="point">楼栋定位 · 1–11号楼</button><button class="point active" data-time="0">工区全景</button><button class="point" data-time="9">作业面近景</button><button class="point" data-time="19">反向总览</button><p class="muted">选择楼栋近景或切换预设视角。</p></article></aside>
 <section class="scene"><div class="scene-head"><strong>三维现场</strong><span class="muted">编辑版实景 · 浏览器渲染</span></div><div class="stage"><iframe id="viewer" title="工程三维实景" allow="fullscreen"></iframe><div class="scene-tag">3DGS 实景 · 人工核查辅助</div></div>
-<div class="controls"><button id="play" class="primary" disabled>镜头巡览</button><button id="reset" disabled>全景复位</button><input id="timeline" type="range" min="0" max="24" step=".1" value="0" aria-label="巡览时间轴" disabled><button id="reload-scene">重新加载场景</button><button id="fullscreen">全屏</button></div><p id="load-status" class="footer-note">正在读取三维实景模型…</p><div class="footer-note">播放预设巡览后可暂停并用鼠标查看。左侧视角按钮可定位预设机位。</div></section>
+<div class="controls"><button id="play" class="primary" disabled>镜头巡览</button><button id="reset" disabled>全景复位</button><input id="timeline" type="range" min="0" max="24" step=".1" value="0" aria-label="巡览时间轴" disabled><button id="reload-scene">重新加载场景</button><button id="fullscreen">全屏</button></div><p id="load-status" role="status" class="footer-note">正在读取三维实景模型…</p><div class="footer-note">播放预设巡览后可暂停并用鼠标查看。左侧视角按钮可定位预设机位。</div></section>
 <aside class="right"><article><h2>AI巡检演示</h2><p>演示疑似问题从提示到人工复核的处理过程。</p><p class="muted">下方内容为模拟样例，与模型中的真实情况无对应关系。</p><button id="simulate" class="primary">运行模拟巡检</button><button id="clear">清空</button><div id="event-list" aria-live="polite"><div class="empty">尚未运行模拟巡检</div></div></article>
 <article><h2>核查记录</h2><div id="detail" class="muted">选择模拟提示，查看核查说明。</div><label class="muted" style="display:block;margin:14px 0 6px">人工备注</label><textarea id="note" rows="3" style="width:100%;background:#091b2b;color:white;border:1px solid #35506a;padding:10px;border-radius:5px" placeholder="记录需要现场复核的事项"></textarea><button id="save">保存本机记录</button><button id="download">导出记录</button><p id="save-status" class="small">备注仅保存在当前浏览器中。</p></article></aside><aside id="agent-drawer" class="agent-drawer" aria-labelledby="agent-title">
 <div class="agent-head"><h2 id="agent-title">巡检 Agent</h2><button type="button" id="close-agent" aria-label="收起巡检 Agent">›</button></div>
@@ -46,7 +46,7 @@
 <p id="housing-detail" aria-live="polite">点击编号可查看楼栋户型并定位。</p>
 <div id="housing-camera"><button type="button" id="go-housing-view" class="primary" disabled>定位到该楼栋</button><p id="housing-camera-status" class="muted" aria-live="polite"></p></div><p class="muted">镜头按规划图与模型外观的对应位置设置。</p>
 </dialog>
-<script src="site-config.js"></script>
+<script src="site-config.js?v=sandbox1"></script>
 <script>
 (() => {
   const config = window.siteConfig;
@@ -60,9 +60,10 @@
     status.textContent = '展示模型待配置';
     return;
   }
-  const viewer = new URL('supersplat-official/package/public/index.html', location.href);
+  const viewer = new URL('sandbox-viewer/index.html', location.href);
 
   viewer.searchParams.set('settings', 'cinematic-immersive.json');
+  viewer.searchParams.set('facade', 'trial');
   viewer.searchParams.set('lang', 'zh-CN');
   viewer.searchParams.set('noui', '');
   viewer.searchParams.set('noanim', '');
@@ -72,22 +73,62 @@
     document.getElementById('enter-scene').disabled = true;
     document.getElementById('viewer').dataset.autoplayTour = 'true';
     const frame = document.getElementById('viewer');
+    const retry = document.getElementById('reload-scene');
+    const originalReload = retry.onclick;
+    const cachedParts = new Map();
+    const downloadPart = async url => {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 45000);
+        try {
+          const response = await fetch(url, {
+            signal: controller.signal,
+            cache: attempt ? 'reload' : 'default'
+          });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const part = await response.blob();
+          if (!part.size) throw new Error('空模型分片');
+          cachedParts.set(url, part);
+          status.textContent = '正在下载模型 · ' + cachedParts.size + ' / ' + config.modelParts.length + ' 个分片';
+          return part;
+        } catch (error) {
+          if (attempt === 2) throw error;
+          status.textContent = '正在重试模型分片 · 已完成 ' + cachedParts.size + ' / ' + config.modelParts.length;
+          await new Promise(resolve => setTimeout(resolve, 600 * (attempt + 1)));
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+    };
     const loadScene = async () => {
+      retry.disabled = true;
+      status.textContent = modelUrl ? '正在打开三维模型…' :
+        '正在下载模型 · ' + cachedParts.size + ' / ' + config.modelParts.length + ' 个分片';
       try {
         if (modelUrl) {
           viewer.searchParams.set('content', new URL(modelUrl, location.href).href);
         } else {
-          const parts = await Promise.all(config.modelParts.map(async url => {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('模型分片加载失败');
-            return response.blob();
-          }));
-          viewer.searchParams.set('content', URL.createObjectURL(new Blob(parts)));
-          viewer.searchParams.set('filename', 'qingyang-edit.sog');
+          const results = await Promise.allSettled(config.modelParts.map(url =>
+            cachedParts.get(url) ?? downloadPart(url)));
+          if (results.some(result => result.status === 'rejected')) throw new Error('模型分片下载失败');
+          const blob = URL.createObjectURL(new Blob(results.map(result => result.value)));
+          cachedParts.clear();
+          viewer.searchParams.set('content', blob);
+          viewer.searchParams.set('filename', 'qingyang-sandbox.sog');
+          window.addEventListener('pagehide', event => {
+            if (!event.persisted) URL.revokeObjectURL(blob);
+          }, { once: true });
         }
+        status.textContent = '模型资源已就绪，正在初始化三维画面…';
         frame.src = viewer.href;
+        retry.textContent = '重新加载场景';
+        retry.onclick = originalReload;
       } catch {
-        status.textContent = '三维模型加载失败，请重新加载场景。';
+        status.textContent = '部分模型分片下载失败，请点击重试。';
+        retry.textContent = '重试下载';
+        retry.onclick = loadScene;
+      } finally {
+        retry.disabled = false;
       }
     };
     loadScene();
@@ -106,7 +147,7 @@
   }, { once: true });
 })();
 </script>
-<script src="dashboard.js?v=auto-tour1"></script>
+<script src="dashboard.js?v=load-retry1"></script>
 <script>
 (() => {
   const buildings = window.siteConfig.buildings;
